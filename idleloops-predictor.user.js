@@ -5,7 +5,8 @@
 // @description  Predicts the amount of resources spent and gained by each action in the action list. Valid as of IdleLoops v.85/Omsi6.
 // @author       Koviko <koviko.net@gmail.com>
 // @match        *omsi6.github.io/loops/*
-// @grant        none
+// @grant        GM_getValue
+// @grant        GM_setValue
 // @run-at       document-idle
 // ==/UserScript==
 
@@ -327,6 +328,10 @@ const Koviko = {
       this.initStyle();
       this.initElements()
       this.initPredictions();
+	  if(GM_getValue('timePercision') !== undefined) {
+          var loadedVal = GM_getValue('timePercision');
+          $('#updateTimePercision').val(loadedVal);
+      }
 
       // Prepare `updateNextActions` to be hooked
       if (!view._updateNextActions) {
@@ -426,6 +431,18 @@ const Koviko = {
         this.totalDisplay.style = 'padding-left:50px;'
         parent.appendChild(this.totalDisplay);
       }
+
+	  //Adds more to the Options panel
+	  $('#menu div:contains("Options") div:first').append("<div id='preditorSettings'><br /><b>Predictor Settings</b><br />Degrees of percision on Time<input id='updateTimePercision' type='number' value='1' min='0' max='10' style='width: 50px;'></div>")
+      $('#updateTimePercision').focusout(function() {
+          if($(this).val() > 10) {
+              $(this).val(10);
+          }
+          if($(this).val() < 1) {
+              $(this).val(1);
+          }
+          GM_setValue('timePercision', $(this).val());
+      });
     }
 
     /**
@@ -721,6 +738,9 @@ const Koviko = {
        */
       const affected = Object.keys(actions.reduce((stats, x) => (x.name in this.predictions && this.predictions[x.name].affected || []).reduce((stats, name) => (stats[name] = true, stats), stats), {}));
 
+	  //This is the percision of the Time field
+	  let percisionForTime = $('#updateTimePercision').val();
+
       // Initialize all affected resources
       affected.forEach(x => state.resources[x] || (state.resources[x] = 0));
 
@@ -826,7 +846,8 @@ const Koviko = {
       var h = Math.floor(totalTicks / 3600);
       var m = Math.floor(totalTicks % 3600 / 60);
       var s = Math.floor(totalTicks % 3600 % 60);
-      var ms = Math.floor(totalTicks % 1 * 1000);
+      var ms = Math.floor(totalTicks % 1 * Math.pow(10,percisionForTime));
+      while(ms.toString().length < percisionForTime) { ms = "0" + ms; }
 
       let totalTime = ('0' + h).slice(-2) + ":" + ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2) + "." + ms;
       container && (this.totalDisplay.innerHTML = intToString(total) + " | " + totalTime);
