@@ -777,10 +777,7 @@ const Koviko = {
             // Calculate the total amount of mana used in the prediction and add it to the total
             total += currentMana - state.resources.mana;
 
-            // Only for Adventure Guild
-            if ( listedAction.name == "Adventure Guild" ) {
-              state.resources.mana += state.resources.adventures * 200;
-            }
+            
 
             // Calculate time spent
             let temp = (currentMana - state.resources.mana) / Math.pow(1 + getSkillLevel("Chronomancy") / 60, 0.25);
@@ -794,6 +791,11 @@ const Koviko = {
               temp /= (1 + Math.min(getBuffLevel("Ritual") - 40, 20) / 40);
             }
             totalTicks += temp;
+
+            // Only for Adventure Guild
+            if ( listedAction.name == "Adventure Guild" ) {
+              state.resources.mana += state.resources.adventures * 200;
+            }
 
             // Run the effect, now that the mana checks are complete
             if (prediction.effect) {
