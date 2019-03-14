@@ -1029,5 +1029,5 @@ const Koviko = {
 };
 
 // Run the code!
-window.addEventListener('load', Koviko.run);
+//window.addEventListener('load', Koviko.run);
 setTimeout(() => document.readyState == 'complete' && Koviko.run(), 2000); // If it hasn't already ran in a couple of seconds, see if it can run
