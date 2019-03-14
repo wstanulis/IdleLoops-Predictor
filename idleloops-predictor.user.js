@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name         IdleLoops Predictor SerVamP
-// @namespace    https://github.com/SerVamP/
+// @name         IdleLoops Predictor wstanulis
+// @namespace    https://github.com/wstanulis/
 // @version      1.7.2
 // @description  Predicts the amount of resources spent and gained by each action in the action list. Valid as of IdleLoops v.85/Omsi6.
 // @author       Koviko <koviko.net@gmail.com>
@@ -423,6 +423,7 @@ const Koviko = {
       if (!this.totalDisplay) {
         this.totalDisplay = document.createElement('span');
         this.totalDisplay.className = 'koviko';
+        this.totalDisplay.style = 'padding-left:50px;'
         parent.appendChild(this.totalDisplay);
       }
     }
