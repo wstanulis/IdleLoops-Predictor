@@ -328,7 +328,7 @@ const Koviko = {
       this.initStyle();
       this.initElements()
       this.initPredictions();
-	  if(GM_getValue('timePercision') !== undefined) {
+	  if(typeof GM_getValue !== "undefined" && GM_getValue('timePercision') !== undefined) {
           var loadedVal = GM_getValue('timePercision');
           $('#updateTimePercision').val(loadedVal);
       }
@@ -435,6 +435,7 @@ const Koviko = {
 	  //Adds more to the Options panel
 	  $('#menu div:contains("Options") div:first').append("<div id='preditorSettings'><br /><b>Predictor Settings</b><br />Degrees of percision on Time<input id='updateTimePercision' type='number' value='1' min='0' max='10' style='width: 50px;'></div>")
       $('#updateTimePercision').focusout(function() {
+        if(typeof GM_setValue !== "undefined") {          
           if($(this).val() > 10) {
               $(this).val(10);
           }
@@ -442,6 +443,7 @@ const Koviko = {
               $(this).val(1);
           }
           GM_setValue('timePercision', $(this).val());
+        }
       });
     }
 
