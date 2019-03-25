@@ -988,7 +988,7 @@ const Koviko = {
         progression.progress += additionalProgress;
 
         // Calculate the progress and current segment after the tick
-        for (; progress >= loopCost(segment) && segment < maxSegments; progress -= loopCost(segment++)) {
+        for (; progress >= loopCost(segment) && progression.completed < maxSegments; progress -= loopCost(segment++)) {
           // Handle the completion of a loop
           if (segment >= totalSegments - 1) {
             progression.progress = 0;
