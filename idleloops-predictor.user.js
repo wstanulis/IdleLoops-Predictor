@@ -433,7 +433,7 @@ const Koviko = {
       }
 
 	  //Adds more to the Options panel
-	  $('#menu div:contains("Options") div:first').append("<div id='preditorSettings'><br /><b>Predictor Settings</b><br />Degrees of percision on Time<input id='updateTimePercision' type='number' value='1' min='0' max='10' style='width: 50px;'></div>")
+	  $('#menu div:nth-child(4) div:first').append("<div id='preditorSettings'><br /><b>Predictor Settings</b><br />Degrees of percision on Time<input id='updateTimePercision' type='number' value='1' min='0' max='10' style='width: 50px;'></div>")
       $('#updateTimePercision').focusout(function() {
         if(typeof GM_setValue !== "undefined") {          
           if($(this).val() > 10) {
@@ -553,7 +553,7 @@ const Koviko = {
         'Practical Magic': { effect: (r, k) => k.practical += 100 },
         'Learn Alchemy': { affected: ['herbs'], canStart: (input) => (input.herbs >= 10), effect: (r, k) => (r.herbs -= 10, k.alchemy += 50, k.magic += 50) },
         'Brew Potions': { affected: ['herbs', 'potions'], canStart: (input) => (input.herbs >= 10 && input.rep >= 5), effect: (r, k) => (r.herbs -= 10, r.potions++, k.alchemy += 25, k.magic += 50) },
-        'Train Dex': {},
+        'Train Dexterity': {},
         'Train Speed': {},
         'Follow Flowers': {},
         'Bird Watching': {canStart: (input) => input.glasses},
