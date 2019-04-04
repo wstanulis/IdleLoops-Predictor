@@ -240,7 +240,7 @@ const Koviko = {
      */
     init(attributes) {
       for (let i in attributes) {
-        this.attributes[i] = { value: attributes[i], delta: null };
+        this.attributes[i] = { value: attributes[i], delta: 0 };
       }
 
       this._isInitialized = true;
@@ -260,7 +260,7 @@ const Koviko = {
       }
 
       for (let i in this.attributes) {
-        this.attributes[i].delta = attributes[i] - this.attributes[i].value;
+        this.attributes[i].delta = attributes[i] - (this.attributes[i].value || 0);
         this.attributes[i].value = attributes[i];
       }
 
@@ -372,7 +372,6 @@ const Koviko = {
       // Build the CSS
       let css = `
       .nextActionContainer{width:auto!important;padding:0 4px}
-      #expandableList{overflow:hidden}
       #nextActionsList{height:100%!important}
       #nextActionsList:hover{margin-left:-100%;padding-left:100%}
       #actionList>div:nth-child(2){left: 53px !important}
@@ -435,7 +434,6 @@ const Koviko = {
 	  //Adds more to the Options panel
 	  $('#menu div:nth-child(4) div:first').append("<div id='preditorSettings'><br /><b>Predictor Settings</b><br />Degrees of percision on Time<input id='updateTimePercision' type='number' value='1' min='0' max='10' style='width: 50px;'></div>")
       $('#updateTimePercision').focusout(function() {
-        if(typeof GM_setValue !== "undefined") {          
           if($(this).val() > 10) {
               $(this).val(10);
           }
@@ -443,7 +441,6 @@ const Koviko = {
               $(this).val(1);
           }
           GM_setValue('timePercision', $(this).val());
-        }
       });
     }
 
@@ -708,7 +705,8 @@ const Koviko = {
         resources: { mana: 250, town: 0 },
         stats: Koviko.globals.statList.reduce((stats, name) => (stats[name] = 0, stats), {}),
         skills: Object.entries(Koviko.globals.skills).reduce((skills, x) => (skills[x[0].toLowerCase()] = x[1].exp, skills), {}),
-        progress: {}
+        progress: {},
+        currProgress: {}
       };
 
       /**
@@ -720,6 +718,7 @@ const Koviko = {
       const snapshots = {
         stats: new Koviko.Snapshot(state.stats),
         skills: new Koviko.Snapshot(state.skills),
+        currProgress: new Koviko.Snapshot({"Fight Monsters": 0, "Heal The Sick": 0, "Small Dungeon": 0, "Large Dungeon": 0, "Hunt Trolls": 0})
       };
 
       /**
@@ -830,6 +829,9 @@ const Koviko = {
             }
           }
 
+          if(prediction.name in state.progress)
+            state.currProgress[prediction.name] = state.progress[prediction.name].completed / prediction.action.segments;
+
           // Update the snapshots
           for (let i in snapshots) {
             snapshots[i].snap(state[i]);
@@ -880,6 +882,7 @@ const Koviko = {
       isValid = isValid ? 'valid' : 'invalid';
       let stats = snapshots.stats.get();
       let skills = snapshots.skills.get();
+      let currProgress = snapshots.currProgress.get();
       let tooltip = '';
 
       for (let i in stats) {
@@ -919,6 +922,37 @@ const Koviko = {
               break;
             case "practical":
               tooltip += 'PRACT';
+              break;
+            default:
+              tooltip += i.toUpperCase();
+          }
+          tooltip += '</b></td><td>' + intToString(level.end, 1) + '</td><td>(+' + intToString(level.end - level.start, 1) + ')</td></tr>';
+        }
+      }
+
+      for (let i in currProgress) {
+        if (currProgress[i].delta) {
+          let level = {
+            start: currProgress[i].value - currProgress[i].delta,
+            end: currProgress[i].value,
+          };
+
+          tooltip += '<tr><td><b>'
+          switch(i) {
+            case "Fight Monsters":
+              tooltip += 'MON';
+              break;
+            case "Heal The Sick":
+              tooltip += 'PT';
+              break;
+            case "Small Dungeon":
+              tooltip += 'SD';
+              break;
+            case "Large Dungeon":
+              tooltip += 'LD';
+              break;
+            case "Hunt Trolls":
+              tooltip += 'TROL';
               break;
             default:
               tooltip += i.toUpperCase();
