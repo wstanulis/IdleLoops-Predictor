@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         IdleLoops Predictor wstanulis
 // @namespace    https://github.com/wstanulis/
-// @version      1.7.2
+// @version      1.7.3
 // @description  Predicts the amount of resources spent and gained by each action in the action list. Valid as of IdleLoops v.85/Omsi6.
 // @author       Koviko <koviko.net@gmail.com>
-// @match        *omsi6.github.io/loops/*
+// @match        http*://omsi6.github.io/loops/*
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @run-at       document-idle
@@ -563,7 +563,7 @@ const Koviko = {
         'Explore City': {},
         'Gamble': { affected: ['gold', 'rep'], canStart: (input) => (input.rep >= -5), effect: (r) => {
           r.temp8 = (r.temp8 || 0) + 1;
-          r.gold += r.temp8 <= towns[2].goodGamble ? 40 : 0;
+          r.gold += r.temp8 <= towns[2].goodGamble ? 40 : -20;
           r.rep--;
         }},
         'Get Drunk': { affected: ['rep'], canStart: (input) => (input.rep >= -3), effect: (r) => r.rep-- },
@@ -739,6 +739,12 @@ const Koviko = {
        */
       const affected = Object.keys(actions.reduce((stats, x) => (x.name in this.predictions && this.predictions[x.name].affected || []).reduce((stats, name) => (stats[name] = true, stats), stats), {}));
 
+
+      /**
+       *This is used to see when the loop becomes invalid due to mana cost
+       */
+      let loopInvalid = false;
+
 	  //This is the percision of the Time field
 	  let percisionForTime = $('#updateTimePercision').val();
 
@@ -840,7 +846,6 @@ const Koviko = {
           // Update the view
           if (div) {
             div.className += ' showthat';
-            div.innerHTML += this.template(affected, state.resources, snapshots, isValid);
           }
         }
       });
