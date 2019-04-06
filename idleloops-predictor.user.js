@@ -846,6 +846,8 @@ const Koviko = {
           // Update the view
           if (div) {
             div.className += ' showthat';
+            div.innerHTML += this.template(affected, state.resources, snapshots, loopInvalid ? false : isValid);
+            loopInvalid = isValid == false ? true : loopInvalid;
           }
         }
       });
