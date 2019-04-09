@@ -846,7 +846,7 @@ const Koviko = {
           // Update the view
           if (div) {
             div.className += ' showthat';
-            div.innerHTML += this.template(affected, state.resources, snapshots, loopInvalid ? false : isValid);
+            div.innerHTML += this.template(listedAction.name, affected, state.resources, snapshots, loopInvalid ? false : isValid);
             loopInvalid = isValid == false ? true : loopInvalid;
           }
         }
@@ -877,6 +877,7 @@ const Koviko = {
     /**
      * Generate the element showing the resources accumulated for an action in the action list.
      * @param {Array.<string>} affected Names of resources to display
+     * @param {string} currname Name of the snapshot on hoverover
      * @param {Koviko.Predictor~Resources} resources Accumulated resources
      * @param {Object} snapshots Snapshots with value comparisons
      * @param {Koviko.Snapshot} snapshots.stats Value comparisons of stats from one snapshot to the next
@@ -885,12 +886,12 @@ const Koviko = {
      * @return {string} HTML of the new element
      * @memberof Koviko.Predictor
      */
-    template(affected, resources, snapshots, isValid) {
+    template(currname, affected, resources, snapshots, isValid) {
       isValid = isValid ? 'valid' : 'invalid';
       let stats = snapshots.stats.get();
       let skills = snapshots.skills.get();
       let currProgress = snapshots.currProgress.get();
-      let tooltip = '';
+      let tooltip = '<tr><th colspan="3"><b>' + currname + '</b></th><tr>';
 
       for (let i in stats) {
         if (stats[i].delta) {
