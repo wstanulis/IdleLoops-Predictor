@@ -1030,9 +1030,10 @@ const Koviko = {
         progression.progress += additionalProgress;
 
         // Calculate the progress and current segment after the tick
-        for (; progress >= loopCost(segment) && progression.completed < maxSegments; progress -= loopCost(segment++)) {
+        while (progress >= loopCost(segment) && progression.completed < maxSegments) {
+          progress -= loopCost(segment++)
           // Handle the completion of a loop
-          if (segment >= totalSegments - 1) {
+          if (segment >= totalSegments) {
             progression.progress = 0;
             progression.completed += totalSegments;
             progression.total++;
@@ -1041,6 +1042,11 @@ const Koviko = {
             // Apply the effect from the completion of a loop
             if (prediction.loop.effect.loop) {
               prediction.loop.effect.loop(state.resources, state.skills);
+            }
+            
+            // Store remaining progress in next loop if next loop is allowed
+            if (progression.completed < maxSegments) {
+              progression.progress = progress;
             }
           }
 
