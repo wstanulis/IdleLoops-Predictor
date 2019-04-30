@@ -785,7 +785,7 @@ const Koviko = {
           // Predict each loop in sequence
           for (let loop = 0; loop < listedAction.loops; loop++) {
             let canStart = typeof(prediction.canStart) === "function" ? prediction.canStart(state.resources) : prediction.canStart;
-            if ( !canStart ) break;
+            if ( !canStart || listedAction.disabled ) break;
 
             // Save the mana prior to the prediction
             currentMana = state.resources.mana;
