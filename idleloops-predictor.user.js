@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         IdleLoops Predictor wstanulis
 // @namespace    https://github.com/wstanulis/
-// @version      1.7.5
+// @version      1.7.6
 // @description  Predicts the amount of resources spent and gained by each action in the action list. Valid as of IdleLoops v.85/Omsi6.
 // @author       Koviko <koviko.net@gmail.com>
 // @match        https://omsi6.github.io/loops/
@@ -61,6 +61,7 @@ const Koviko = {
    * Globals
    * @prop {Koviko~View} view IdleLoops view object
    * @prop {Object} actions IdleLoops actions object
+   * @prop {Object} Action IdleLoops Action object
    * @prop {Array.<Koviko~ListedAction>} actions.next Action List
    * @prop {HTMLElement} nextActionsDiv Action list container
    * @prop {Array.<string>} statList Names of all stats
@@ -73,15 +74,11 @@ const Koviko = {
    * @prop {function} getLevelFromExp Converts an amount of stat experience into a level
    * @prop {function} getSkillLevelFromExp Converts an amount of skill experience into a level
    * @prop {function} getTotalBonusXP Determine the current amount of bonus XP from talents and soulstones
-   * @prop {function} goldCostSmashPots Determine the amount of mana gained from smashing pots
-   * @prop {function} goldCostWildMana Determine the amount of mana gained from finding wild mana
-   * @prop {function} goldCostLocks Determine the amount of gold gained from lockpicking
-   * @prop {function} goldCostSQuests Determine the amount of gold gained from short quests
-   * @prop {function} goldCostLQuests Determine the amount of gold gained from long quests
    */
   globals: {
     view: null,
     actions: null,
+    Action: null,
     nextActionsDiv: null,
     statList: null,
     skills: null,
@@ -93,11 +90,6 @@ const Koviko = {
     getLevelFromExp: null,
     getSkillLevelFromExp: null,
     getTotalBonusXP: null,
-    goldCostSmashPots: null,
-    goldCostWildMana: null,
-    goldCostLocks: null,
-    goldCostSQuests: null,
-    goldCostLQuests: null,
   },
 
   /** A prediction, capable of calculating and estimating ticks and rewards of an action. */
@@ -503,11 +495,11 @@ const Koviko = {
         'Wander': {},
         'Smash Pots': { affected: ['mana'], effect: (r) => {
           r.temp1 = (r.temp1 || 0) + 1;
-          r.mana += r.temp1 <= towns[0].goodPots ? g.goldCostSmashPots() : 0;
+          r.mana += r.temp1 <= towns[0].goodPots ? g.Action.SmashPots.goldCost() : 0;
         }},
         'Pick Locks': { affected: ['gold'], effect: (r) => {
           r.temp2 = (r.temp2 || 0) + 1;
-          r.gold += r.temp2 <= towns[0].goodLocks ? g.goldCostLocks() : 0;
+          r.gold += r.temp2 <= towns[0].goodLocks ? g.Action.PickLocks.goldCost() : 0;
         }},
         'Buy Glasses': { effect: (r) => (r.gold -= 10, r.glasses = true) },
         'Buy Mana': { affected: ['mana', 'gold'], effect: (r) => (r.mana += r.gold * 50, r.gold = 0) },
@@ -515,12 +507,12 @@ const Koviko = {
         'Train Strength': {},
         'Short Quest': { affected: ['gold'], effect: (r) => {
           r.temp3 = (r.temp3 || 0) + 1;
-          r.gold += r.temp3 <= towns[0].goodSQuests ? g.goldCostSQuests() : 0;
+          r.gold += r.temp3 <= towns[0].goodSQuests ? g.Action.ShortQuest.goldCost() : 0;
         }},
         'Investigate': {},
         'Long Quest': { affected: ['gold', 'rep'], effect: (r) => {
           r.temp4 = (r.temp4 || 0) + 1;
-          r.gold += r.temp4 <= towns[0].goodLQuests ? g.goldCostLQuests() : 0;
+          r.gold += r.temp4 <= towns[0].goodLQuests ? g.Action.LongQuest.goldCost() : 0;
           r.rep += r.temp4 <= towns[0].goodLQuests ? 1 : 0;
         }},
         'Throw Party': { affected: ['rep'], effect: (r) => r.rep -= 2 },
@@ -534,7 +526,7 @@ const Koviko = {
         'Explore Forest': {},
         'Wild Mana': { affected: ['mana'], effect: (r) => {
           r.temp5 = (r.temp5 || 0) + 1;
-          r.mana += r.temp5 <= towns[1].goodWildMana ? g.goldCostWildMana() : 0;
+          r.mana += r.temp5 <= towns[1].goodWildMana ? g.Action.WildMana.goldCost() : 0;
         }},
         'Gather Herbs': { affected: ['herbs'], effect: (r) => {
           r.temp6 = (r.temp6 || 0) + 1;
